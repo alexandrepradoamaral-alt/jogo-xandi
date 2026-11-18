@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meu Jogo 2D</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="interface-jogo">
+        <div id="placar">
+            <p>Pontos: <span id="pontos">0</span></p>
+            <p>Vidas: <span id="vidas">3</span></p>
+        </div>
+        
+        <!-- O Canvas é a tela onde o jogo será desenhado -->
+        <canvas id="gameCanvas" width="800" height="400"></canvas>
+        
+        <div id="tela-fim" class="escondido">
+            <h1 id="mensagem-fim">Fim de Jogo!</h1>
+            <button onclick="reiniciarJogo()">Reiniciar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
