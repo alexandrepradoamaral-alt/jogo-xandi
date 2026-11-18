@@ -70,4 +70,113 @@ function atualizar() {
     if (jogador.y > canvas.height) { perderVida(); }
 
     // Colisão com Plataformas
-    jogador.noChao =
+    jogador.noChao = false;
+    plataformas.forEach(plat => {
+        if (jogador.x < plat.x + plat.largura &&
+            jogador.x + jogador.largura > plat.x &&
+            jogador.y + jogador.altura >= plat.y &&
+            jogador.y + jogador.altura <= plat.y + jogador.velY + 2) {
+            jogador.noChao = true;
+            jogador.y = plat.y - jogador.altura;
+            jogador.velY = 0;
+        }
+    });
+
+    // Colisão com moedas
+    moedas.forEach(moeda => {
+        if (!moeda.coletada) {
+            if (jogador.x < moeda.x + moeda.raio && jogador.x + jogador.largura > moeda.x - moeda.raio &&
+                jogador.y < moeda.y + moeda.raio && jogador.y + jogador.altura > moeda.y - moeda.raio) {
+                moeda.coletada = true;
+                pontos += 10;
+            }
+        }
+    });
+
+    // Colisão e movimento dos inimigos
+    inimigos.forEach(inimigo => {
+        inimigo.x += inimigo.velocidade * inimigo.direcao;
+        if (inimigo.x <= inimigo.minX || inimigo.x + inimigo.largura >= inimigo.maxX) {
+            inimigo.direcao *= -1;
+        }
+        if (jogador.x < inimigo.x + inimigo.largura && jogador.x + jogador.largura > inimigo.x &&
+            jogador.y < inimigo.y + inimigo.altura && jogador.y + jogador.altura > inimigo.y) {
+            perderVida();
+        }
+    });
+}
+
+// 6. FUNÇÕES DE VIDA E REINICIAR
+function perderVida() {
+    vidas--;
+    if (vidas <= 0) {
+        gameOver = true;
+        mensagemEl.innerText = "Fim de Jogo!";
+        restartBtn.style.display = "block";
+    } else {
+        // Volta pro começo se ainda tem vida
+        jogador.x = 50;
+        jogador.y = 300;
+        jogador.velY = 0;
+    }
+}
+
+function reiniciarJogo() {
+    vidas = 3;
+    pontos = 0;
+    gameOver = false;
+    jogador.x = 50;
+    jogador.y = 300;
+    jogador.velY = 0;
+    moedas.forEach(m => m.coletada = false);
+    mensagemEl.innerText = "";
+    restartBtn.style.display = "none";
+    loop(); // Faz o jogo voltar a rodar
+}
+
+// 7. DESENHAR TUDO NA TELA
+function desenhar() {
+    // Fundo
+    ctx.fillStyle = "#87CEEB"; // Cor de céu azul
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    // Plataformas
+    ctx.fillStyle = "#2ecc71"; // Verde
+    plataformas.forEach(plat => ctx.fillRect(plat.x, plat.y, plat.largura, plat.altura));
+
+    // Moedas
+    ctx.fillStyle = "#f1c40f"; // Amarelo
+    moedas.forEach(moeda => {
+        if (!moeda.coletada) {
+            ctx.beginPath();
+            ctx.arc(moeda.x, moeda.y, moeda.raio, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    });
+
+    // Inimigos
+    ctx.fillStyle = "#e74c3c"; // Vermelho
+    inimigos.forEach(inimigo => ctx.fillRect(inimigo.x, inimigo.y, inimigo.largura, inimigo.altura));
+
+    // Jogador
+    ctx.fillStyle = jogador.cor;
+    ctx.fillRect(jogador.x, jogador.y, jogador.largura, jogador.altura);
+
+    // Placar
+    ctx.fillStyle = "#000";
+    ctx.font = "20px Arial";
+    ctx.fillText("Pontos: " + pontos, 10, 30);
+    ctx.fillText("Vidas: " + vidas, 10, 60);
+}
+
+// 8. O MOTOR DO JOGO (Loop)
+function loop() {
+    if (!gameOver) {
+        atualizar();
+        desenhar();
+        requestAnimationFrame(loop);
+    }
+}
+
+// Começa o jogo pela primeira vez!
+loop();
